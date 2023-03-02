@@ -1,0 +1,24 @@
+pip install pandas
+pip install seaborn
+pip install google-api-python-client
+
+from googleapiclient.discovery import build
+import pandas as pd
+import seaborn as sns
+
+api_key ='AIzaSyCdU1c6LgbacrCyu6l4bSyrPDqmYshUmkQ'
+channel_id = 'UCnz-ZXXER4jOvuED5trXfEA'
+youtube=build('youtube','v3',developerKey=api_key)
+
+def get_channel_stats(youtube,channel_id):
+    request =youtube.channels().list(
+    part='snippet,contentDetails,statistics',
+    id=channel__id) 
+    response=request.excute()
+    return response
+    data=dict(channel_name=response['item'][0]['snippet']['title'],
+                subscribers=response['item'][0]['statistics']['subscriberCount'],
+                views=response['item'][0]['statistics']['viewCount'],
+                Total_videos=response['item'][0]['statistics']['videoCount'])
+            
+    return data
