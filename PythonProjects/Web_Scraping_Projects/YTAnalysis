@@ -7,18 +7,121 @@ import pandas as pd
 import seaborn as sns
 
 api_key ='AIzaSyCdU1c6LgbacrCyu6l4bSyrPDqmYshUmkQ'
-channel_id = 'UCnz-ZXXER4jOvuED5trXfEA'
-youtube=build('youtube','v3',developerKey=api_key)
+channel_ids = ["UCnz-ZXXER4jOvuED5trXfEA",#techTFQ
+             "UCLLw7jmFsvfIVaUFsLs8mlQ",#Luke Barousse
+              "UCiT9RITQ9PW6BhXK0y2jaeg",#ken jee
+              "UC7cs8q-gJRlGwj4A8OmCmXg",#Alex The Analyst
+              "UC2UXDak6o7rBm23k3Vv5dww"#tina huang           
+             ]
 
-def get_channel_stats(youtube,channel_id):
+def get_channel_stats(youtube,channel_ids):
+    all_data=[]
     request =youtube.channels().list(
     part='snippet,contentDetails,statistics',
-    id=channel__id) 
-    response=request.excute()
-    return response
-    data=dict(channel_name=response['item'][0]['snippet']['title'],
-                subscribers=response['item'][0]['statistics']['subscriberCount'],
-                views=response['item'][0]['statistics']['viewCount'],
-                Total_videos=response['item'][0]['statistics']['videoCount'])
-            
-    return data
+    id=','.join(channel_ids)) 
+    response=request.execute()
+    #return response  
+    for i in range(len(response['items'])):
+        data=dict(channel_name=response['items'][i]['snippet']['title'],
+                    subscribers=response['items'][i]['statistics']['subscriberCount'],
+                    views=response['items'][i]['statistics']['viewCount'],
+                    Total_videos=response['items'][i]['statistics']['videoCount'],
+                    playlist_id=response['items'][i]['contentDetails']['relatedPlaylists']['uploads'])
+        all_data.append(data)
+    return all_data
+    
+    
+    channel_statistics=get_channel_stats(youtube,channel_ids)
+    channel_statistics
+    
+    
+df = pd.DataFrame(channel_statistics)
+
+df
+
+df['subscribers']=pd.to_numeric(df['subscribers'])
+df['views']=pd.to_numeric(df['views'])
+df['Total_videos']=pd.to_numeric(df['Total_videos'])
+
+df.dtypes
+
+df['channel_name']
+
+sns.set(rc={'figure.figsize':(12,8)})
+ax=sns.barplot(x='channel_name',y='subscribers',data=df)
+
+sns.set(rc={'figure.figsize':(12,8)})
+ax=sns.barplot(x='channel_name',y='views',data=df)
+
+sns.set(rc={'figure.figsize':(12,8)})
+ax=sns.barplot(x='channel_name',y='Total_videos',data=df)
+
+
+playlist_id=df.loc[df['channel_name']=='Ken Jee','playlist_id'].iloc[0]
+playlist_id
+
+
+def get_video_ids(youtube,playlist_id):
+    request=youtube.playlistItems().list(
+        part='contentDetails',
+        playlistId=playlist_id,
+        maxResults=50)
+    response=request.execute()
+    videos_ids=[]
+    for i in range(len(response['items'])):
+        videos_ids.append(response['items'][i]['contentDetails']['videoId'])
+    next_page_Token=response.get('nextPageToken')
+    more_pages=True
+    while more_pages:
+        if next_page_Token is None:
+            more_pages=False
+        else:
+            request=youtube.playlistItems().list(
+                part='contentDetails',
+                playlistId=playlist_id,
+                maxResults=50,
+                pageToken=next_page_Token)
+            response=request.execute()
+        for i in range(len(response['items'])):
+            videos_ids.append(response['items'][i]['contentDetails']['videoId'])
+        next_page_Token=response.get('nextPageToken')
+        
+        
+    return videos_ids
+    
+    
+    
+videos_ids=get_video_ids(youtube,playlist_id)
+      
+videos_ids
+df1 = pd.DataFrame(video_details)
+#df1.drop_duplicates()
+df1.head(10)
+    
+df1['Published_date']=pd.to_datetime(df1['Published_date'])
+df1['Views']=pd.to_numeric(df1['Views'])
+df1['Likes']=pd.to_numeric(df1['Likes'])
+df1['Comments']=pd.to_numeric(df1['Comments'])
+
+df1.dtypes
+
+#df1[140:245]
+# top20_videos = df1.sort_values(by='Views',ascending=False).head(20) 
+# top20_videos
+
+ax1=sns.barplot(x='Views',y='Title',data=top10_videos)
+df1
+#Creating Month Column in dataframe(df1)
+df1['Month']=pd.to_datetime(df1['Published_date']).dt.strftime('%b')
+
+videos_per_month =df1.groupby('Month',as_index=False).size()
+videos_per_month
+
+sort_order=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+videos_per_month.index=pd.CategoricalIndex(videos_per_month['Month'],categories=sort_order,ordered=True)
+videos_per_month.sort_index()
+
+
+ax2=sns.barplot(x='Month',y='size',data=videos_per_month)
+
+df1.to_csv('video details of ken jee.csv')
