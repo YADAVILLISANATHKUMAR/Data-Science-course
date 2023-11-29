@@ -32,3 +32,10 @@ Query Engines: Engines run queries against data to return answers. Data engineer
 
 Data Engineering vs. Data Science
 Data engineering and data science are two complementary skills. Data engineers help make data reliable and consistent for analysis. Data scientists need reliable data for machine learning, data exploration, and other analytical projects involving large data sets. Data scientists may rely on data engineers to find and prepare data for their analysis.
+
+
+Data Engineering with Dremio
+Dremio simplifies data management for data engineers and a single, unified access point for all enterprise data for BI and ad-hoc self-service. Learn more about the data lakehouse with Dremio.
+
+Ready to go deeper? Read a more technical article on data engineering.
+
