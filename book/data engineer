@@ -27,3 +27,8 @@ SQL: Structured Query Language (SQL) is the standard language for querying relat
 Python: Python is a general programming language. Data engineers may choose to use Python for ETL tasks.
 Cloud Data Storage: Including Amazon S3, Azure Data Lake Storage (ADLS), Google Cloud Storage, etc.
 Query Engines: Engines run queries against data to return answers. Data engineers may work with engines like Dremio Sonar, Spark, Flink, and others.
+
+
+
+Data Engineering vs. Data Science
+Data engineering and data science are two complementary skills. Data engineers help make data reliable and consistent for analysis. Data scientists need reliable data for machine learning, data exploration, and other analytical projects involving large data sets. Data scientists may rely on data engineers to find and prepare data for their analysis.
